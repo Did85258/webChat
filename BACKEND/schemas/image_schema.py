@@ -1,7 +1,6 @@
 from pydantic import BaseModel
 
 class ImageSchema(BaseModel):
-    image_id: int
     encryption_key: str
     storage_url: str
 

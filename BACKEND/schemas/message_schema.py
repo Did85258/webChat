@@ -2,7 +2,6 @@ from pydantic import BaseModel
 from datetime import datetime
 
 class MessageSchema(BaseModel):
-    message_id: int
     sender_id: int
     receiver_id: int
     timestamp: datetime
