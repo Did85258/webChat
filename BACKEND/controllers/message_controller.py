@@ -1,7 +1,8 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from models.message_model import Message
-from schemas.message_schema import MessageSchema
+from models.user_model import User
+from schemas.message_schema import MessageSchema ,MessageResponse
 
 class MessageController:
 
@@ -42,3 +43,33 @@ class MessageController:
         db.delete(db_message)
         db.commit()
         return {"detail": "Message deleted successfully"}
+    
+    def get_messages(user_id_1: int, user_id_2: int, db: Session):
+        # ค้นหาข้อความที่ส่งระหว่าง user_id_1 และ user_id_2
+        messages = db.query(Message).filter(
+            (Message.sender_id == user_id_1) & (Message.receiver_id == user_id_2) |
+            (Message.sender_id == user_id_2) & (Message.receiver_id == user_id_1)
+        ).all()
+
+        if not messages:
+            raise HTTPException(status_code=404, detail="No messages found")
+
+        response = []
+        for message in messages:
+            sender_username = db.query(User).filter(User.user_id == message.sender_id).first().user_name
+            receiver_username = db.query(User).filter(User.user_id == message.receiver_id).first().user_name
+
+            response.append({
+                "message_id": message.message_id,
+                "sender_id": message.sender_id,
+                "receiver_id": message.receiver_id,
+                "content": message.content,
+                "timestamp": message.timestamp.isoformat(),  # แปลงเป็น string
+                "message_type": message.message_type,
+                "sender_username": sender_username,
+                "receiver_username": receiver_username
+            })
+
+        return response
+    
+

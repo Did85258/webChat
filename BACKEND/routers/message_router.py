@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from database import get_db
 from controllers.message_controller import MessageController
-from schemas.message_schema import MessageSchema
+from schemas.message_schema import MessageSchema,MessageResponse
 from typing import List
 from middleware import check_permissions, decode_token
 
@@ -32,3 +32,7 @@ async def update_existing_message(message_id: int, message: MessageSchema, db: S
 @router.delete("/{message_id}")
 async def delete_existing_message(message_id: int, db: Session = Depends(get_db), role: str = Depends(check_permissions)):
     return MessageController.delete_message(db, message_id)
+
+@router.get("/messages/{user_id_1}/{user_id_2}", response_model=List[MessageResponse])
+def read_messages(user_id_1: int, user_id_2: int, db: Session = Depends(get_db)):
+    return MessageController.get_messages(user_id_1, user_id_2, db)

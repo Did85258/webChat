@@ -32,6 +32,7 @@ app.include_router(user__router.router, prefix="/user", tags=["user"])
 app.include_router(image_router.router, prefix="/image", tags=["image"])
 app.include_router(message_router.router, prefix="/message", tags=["message"])
 
+
 @app.get("/")
 def read_root():
     return {"message": "Web Chat Application"}

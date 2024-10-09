@@ -1,10 +1,11 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import List
 
 class MessageSchema(BaseModel):
     sender_id: int
     receiver_id: int
-    timestamp: datetime
+    timestamp: str
     content: str
     image_id: int
     message_type: bool
@@ -17,9 +18,15 @@ class MessageBase(BaseModel):
 class MessageCreate(MessageBase):
     pass
 
-class MessageResponse(MessageBase):
+class MessageResponse(BaseModel):
     message_id: int
-    timestamp: datetime
+    sender_id: int
+    receiver_id: int
+    content: str
+    timestamp: str
+    message_type: int
+    sender_username: str
+    receiver_username: str
 
     class Config:
         from_attributes = True
