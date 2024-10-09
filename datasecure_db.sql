@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 09, 2024 at 01:44 PM
+-- Generation Time: Oct 09, 2024 at 06:34 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -33,6 +33,13 @@ CREATE TABLE `images` (
   `storage_url` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `images`
+--
+
+INSERT INTO `images` (`image_id`, `encryption_key`, `storage_url`) VALUES
+(2, 'string', 'string');
+
 -- --------------------------------------------------------
 
 --
@@ -44,10 +51,20 @@ CREATE TABLE `messages` (
   `sender_id` int(11) DEFAULT NULL,
   `receiver_id` int(11) DEFAULT NULL,
   `timestamp` timestamp NOT NULL DEFAULT current_timestamp(),
-  `content` text NOT NULL,
-  `image_id` int(11) NOT NULL,
+  `content` text DEFAULT NULL,
+  `image_id` int(11) DEFAULT NULL,
   `message_type` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `messages`
+--
+
+INSERT INTO `messages` (`message_id`, `sender_id`, `receiver_id`, `timestamp`, `content`, `image_id`, `message_type`) VALUES
+(4, 7, 8, '2024-10-09 04:58:12', 'string', 2, 1),
+(9, 7, 8, '2024-10-09 15:50:53', 'dzfbfdbdfzdb', NULL, 0),
+(10, 8, 7, '2024-10-09 15:51:16', 'ahgaggtgtg', NULL, 0),
+(11, 7, 9, '2024-10-09 16:16:52', 'etahbthbstrngfvcvvcvb', NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -107,13 +124,13 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `images`
 --
 ALTER TABLE `images`
-  MODIFY `image_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `image_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `message_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `message_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `user`
