@@ -5,7 +5,9 @@ from models.user_model import User
 from controllers.image_controller import ImageController
 from schemas.message_schema import MessageSchema ,MessageResponse, MessageSchemaIMG,MessageSchemaTEXT
 from datetime import datetime
-from .compress import compress_image_data
+import gzip
+import base64
+from io import BytesIO
 
 
 class MessageController:
@@ -77,61 +79,6 @@ class MessageController:
         db.commit()
         return {"detail": "Message deleted successfully"}
     
-    # def get_messages(user_id_1: int, user_id_2: int, db: Session):
-    #     messages = db.query(Message).filter(
-    #         (Message.sender_id == user_id_1) & (Message.receiver_id == user_id_2) |
-    #         (Message.sender_id == user_id_2) & (Message.receiver_id == user_id_1)
-    #     ).all()
-
-    #     if not messages:
-    #         raise HTTPException(status_code=404, detail="No messages found")
-
-    #     response = []
-
-    #     for message in messages:
-    #         sender_username = db.query(User).filter(User.user_id == message.sender_id).first().user_name
-    #         receiver_username = db.query(User).filter(User.user_id == message.receiver_id).first().user_name
-
-    #         imgBase64 = None
-    #         if message.image_id is not None:
-    #             try:
-    #                 imgBase64 = ImageController.decrypt_image(db, message.image_id, message.receiver_id)
-    #                 # print("Decrypted Image (Base64):", imgBase64)  # ตรวจสอบค่า
-    #                 if imgBase64:
-    #                     imgBase64 = compress_base64_data(imgBase64)
-    #                     # print("Compressed Base64:", imgBase64)  # ตรวจสอบค่า
-
-    #             except HTTPException:
-    #                 imgBase64 = None
-    #                 print("Error in decrypting image.")
-    #                 # print({
-    #                 #         "message_id": message.message_id,
-    #                 #         "sender_id": message.sender_id,
-    #                 #         "receiver_id": message.receiver_id,
-    #                 #         "content": message.content,
-    #                 #         "imageBase64": imgBase64 if imgBase64 else "No Image",
-    #                 #         "timestamp": message.timestamp.isoformat(),
-    #                 #         "message_type": message.message_type,
-    #                 #         "sender_username": sender_username,
-    #                 #         "receiver_username": receiver_username
-    #                 #     })
-
-
-
-    #         response.append({
-    #             "message_id": message.message_id,
-    #             "sender_id": message.sender_id,
-    #             "receiver_id": message.receiver_id,
-    #             "content": message.content,
-    #             "imageBase64": imgBase64 if imgBase64 else "",  # ตรวจสอบค่าที่ได้
-    #             "timestamp": message.timestamp.isoformat(),
-    #             "message_type": message.message_type,
-    #             "sender_username": sender_username,
-    #             "receiver_username": receiver_username
-    #         })
-                
-
-    #     return response
     def get_messages(user_id_1: int, user_id_2: int, db: Session):
         messages = db.query(Message).filter(
             (Message.sender_id == user_id_1) & (Message.receiver_id == user_id_2) |
@@ -147,34 +94,61 @@ class MessageController:
             sender_username = db.query(User).filter(User.user_id == message.sender_id).first().user_name
             receiver_username = db.query(User).filter(User.user_id == message.receiver_id).first().user_name
 
-            image_bytes = None
+            imgBase64 = None
             if message.image_id is not None:
                 try:
-                    # ถอดรหัสภาพโดยไม่ต้องเข้ารหัส Base64
-                    image_bytes = ImageController.decrypt_image(db, message.image_id, message.receiver_id)
+                    imgBase64 = ImageController.decrypt_image(db, message.image_id, message.receiver_id)
+                    #print("Decrypted Image (Base64):", imgBase64)  # ตรวจสอบค่า
                     
-                    if image_bytes:
-                        # ถ้าต้องการบีบอัดข้อมูลภาพ สามารถทำได้ที่นี่
-                        image_bytes = compress_image_data(image_bytes)  # ฟังก์ชันบีบอัดภาพที่คุณต้องการใช้
-                        # print(image_bytes)
-
+                    if imgBase64:
+                        imgBase64 = MessageController.compress_base64_data(imgBase64)
+                        print("Compressed Base64:", imgBase64)  # ตรวจสอบค่า
+                    
                 except HTTPException:
-                    image_bytes = None
+                    imgBase64 = None
                     print("Error in decrypting image.")
-            # print(image_bytes)
-            
+                    # print({
+                    #     "message_id": message.message_id,
+                    #     "sender_id": message.sender_id,
+                    #     "receiver_id": message.receiver_id,
+                    #     "content": message.content,
+                    #     "imageBase64": imgBase64 if imgBase64 else "No Image",
+                    #     "timestamp": message.timestamp.isoformat(),
+                    #     "message_type": message.message_type,
+                    #     "sender_username": sender_username,
+                    #     "receiver_username": receiver_username
+                    # })
+
+
+
             response.append({
                 "message_id": message.message_id,
                 "sender_id": message.sender_id,
                 "receiver_id": message.receiver_id,
                 "content": message.content,
-                "imageBytes": image_bytes if image_bytes else None,  # ใช้ None หากไม่มีภาพ
+                "imageBase64": imgBase64 if imgBase64 else "",  # ตรวจสอบค่าที่ได้
                 "timestamp": message.timestamp.isoformat(),
                 "message_type": message.message_type,
                 "sender_username": sender_username,
                 "receiver_username": receiver_username
             })
-
+                
+        
         return response
-
+    
+    def compress_base64_data(img_base64: str) -> str:
+        
+        
+        # แปลง base64 string ให้เป็น bytes
+        img_data = base64.b64decode(img_base64)
+        
+        # บีบอัดด้วย gzip
+        buffer = BytesIO()
+        with gzip.GzipFile(fileobj=buffer, mode='wb') as f:
+            f.write(img_data)
+        
+        # แปลงกลับเป็น base64 ที่บีบอัดแล้ว
+        compressed_img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+        
+        return compressed_img_base64
 

@@ -10,6 +10,7 @@ import Test from "./Test";
 import Login from "./components/page/Login";
 import Register from "./components/page/Register";
 import { ProtectedRouteUser } from "./components/Protect/ProtectedRoute";
+import Test2 from "./Test2";
 
 const router = createBrowserRouter([
   {
@@ -22,7 +23,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/test",
-    element: <Test />,
+    element: <Test2 />,
   },
   {
     path: "/login",

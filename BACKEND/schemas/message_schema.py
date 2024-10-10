@@ -32,7 +32,7 @@ class MessageResponse(BaseModel):
     sender_id: int
     receiver_id: int
     content: Optional[str] = ""  # ให้ default เป็น string ว่าง
-    imageBytes: Optional[bytes] = None
+    imageBase64: str
     timestamp: str
     message_type: int
     sender_username: str

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Chat from "./Chat";
+import Pako from "pako";
 const BASE_URL = "http://127.0.0.1:8000";
 export default function Content() {
   const fileInputRef = useRef(null); // สร้าง reference สำหรับ input file
@@ -98,8 +99,7 @@ export default function Content() {
         setError("No token found");
         return;
       }
-      console.log(userId2);
-      console.log(userId1);
+
       const responseMessage = await fetch(
         `${BASE_URL}/message/messages/${userId1}/${userId2}`,
         {
@@ -114,12 +114,24 @@ export default function Content() {
       if (!responseMessage.ok) {
         throw new Error(`HTTP error! status: ${responseMessage.status}`);
       }
-      // console.log(responseUsers);
 
       const resultMessage = await responseMessage.json();
-      console.log(resultMessage);
+      // console.log(resultMessage);
+
       if (resultMessage) {
-        setMessageData(resultMessage);
+        const updatedMessages = resultMessage.map((message) => {
+          if (message.imageBase64 && message.imageBase64.trim() !== "") {
+            const imageBlob = decompressBase64(message.imageBase64);
+            const imageUrl = URL.createObjectURL(imageBlob); // สร้าง URL จาก Blob
+            return {
+              ...message,
+              imageUrl, // เพิ่ม key ใหม่ที่ชื่อ imageUrl
+            };
+          }
+          return message; // ถ้าไม่มี imageBase64 ให้ return object เดิม
+        });
+
+        setMessageData(updatedMessages);
       } else {
         throw new Error("Data received is not an array");
       }
@@ -131,6 +143,25 @@ export default function Content() {
   };
   //chat
 
+<<<<<<< Updated upstream
+=======
+  //
+  const decompressBase64 = (base64String) => {
+    // แปลง base64 เป็น array buffer ก่อน
+    const binaryString = atob(base64String);
+    const binaryLength = binaryString.length;
+    const bytes = new Uint8Array(binaryLength);
+    for (let i = 0; i < binaryLength; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    // ใช้ pako.inflate เพื่อถอดการบีบอัด
+    const decompressedBytes = Pako.inflate(bytes);
+    return new Blob([decompressedBytes], { type: "image/jpeg" }); // เปลี่ยน type ตามประเภทของรูปภาพ
+  };
+
+  console.log(messageData);
+
+>>>>>>> Stashed changes
   const handleOpenChat = (userId2, name2) => {
     fetchChatData(userId2);
     setNameChatWith(name2);
@@ -196,14 +227,18 @@ export default function Content() {
                             </div>
                           )}
                           {row.message_type == 1 && (
-                            <div className="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
+                            <div className="relative mr-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
                               <div>
+<<<<<<< Updated upstream
                                 <img
                                   src="/src/assets/1.jpeg"
+=======
+                                {/* {console.log(row.imageBase64)} */}
+                                <img
+                                  src={`${row.imageUrl}`}
+>>>>>>> Stashed changes
                                   className="w-56 cursor-pointer"
-                                  onClick={() =>
-                                    handleImageClick("/src/assets/1.jpeg")
-                                  } // เรียกใช้งานฟังก์ชันเมื่อคลิกที่รูปภาพ
+                                  onClick={() => handleImageClick(row.imageUrl)} // เรียกใช้งานฟังก์ชันเมื่อคลิกที่รูปภาพ
                                   alt="Thumbnail"
                                 />
                               </div>
@@ -228,14 +263,17 @@ export default function Content() {
                           {row.message_type == 1 && (
                             <div className="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
                               <div>
+<<<<<<< Updated upstream
                                 <img
                                   src="/src/assets/1.jpeg"
+=======
+                                {console.log(row.imageBase64)}
+                                {/* {decompressBase64Data(row.imageBase64)} */}
+                                <img
+                                  src={`${row.imageUrl}`}
+>>>>>>> Stashed changes
                                   className="w-56 cursor-pointer"
-                                  onClick={() =>
-                                    handleImageClick(
-                                      "/src/assets/vector-users-icon.jpg"
-                                    )
-                                  } // เรียกใช้งานฟังก์ชันเมื่อคลิกที่รูปภาพ
+                                  onClick={() => handleImageClick(row.imageUrl)} // เรียกใช้งานฟังก์ชันเมื่อคลิกที่รูปภาพ
                                   alt="Thumbnail"
                                 />
                               </div>
@@ -245,6 +283,7 @@ export default function Content() {
                       </div>
                     )
                   )}
+<<<<<<< Updated upstream
                   <div
                         
                         className="col-start-1 col-end-8 p-3 rounded-lg"
@@ -275,6 +314,9 @@ export default function Content() {
                        
                         </div>
                       </div>
+=======
+                  
+>>>>>>> Stashed changes
                 </div>
               </div>
             </div>
