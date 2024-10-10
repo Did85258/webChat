@@ -36,21 +36,21 @@ async def update_existing_image(image_id: int, image: ImageSchema, db: Session =
 async def delete_existing_image(image_id: int, db: Session = Depends(get_db), role: str = Depends(check_permissions)):
     return ImageController.delete_image(db, image_id)
 
-@router.post("/upload/{receiver_id}", response_model=ImageResponse)
-async def upload_image_route(receiver_id: int, file: UploadFile = File(...), db: Session = Depends(get_db)):
-    return await ImageController.upload_image(receiver_id, file, db)
+@router.post("/upload/{sender_id}/{receiver_id}", response_model=ImageResponse)
+async def upload_image_route(sender_id: int, receiver_id: int, file: UploadFile = File(...), db: Session = Depends(get_db)):
+    return await ImageController.upload_image(sender_id, receiver_id, file, db)
 
 
-@router.get("/image111/{image_id}/{receiver_id}")
-async def get_image(image_id: int,receiver_id: int, db: Session = Depends(get_db)):
-    try:
-        # เรียกใช้ฟังก์ชันถอดรหัสภาพ
-        image_data = ImageController.decrypt_image(db, image_id, receiver_id)
+# @router.get("/image111/{image_id}/{receiver_id}")
+# async def get_image(image_id: int,receiver_id: int, db: Session = Depends(get_db)):
+#     try:
+#         # เรียกใช้ฟังก์ชันถอดรหัสภาพ
+#         image_data = ImageController.decrypt_image(db, image_id, receiver_id)
         
-        # สร้าง BytesIO object เพื่อส่งภาพ
-        image_stream = BytesIO(image_data)
-        image_stream.seek(0)
+#         # สร้าง BytesIO object เพื่อส่งภาพ
+#         image_stream = BytesIO(image_data)
+#         image_stream.seek(0)
         
-        return StreamingResponse(image_stream, media_type="image/jpeg")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+#         return StreamingResponse(image_stream, media_type="image/jpeg")
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
