@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Chat from "./Chat";
+import Pako from "pako";
 const BASE_URL = "http://127.0.0.1:8000";
 export default function Content() {
   const fileInputRef = useRef(null); // สร้าง reference สำหรับ input file
@@ -98,8 +99,7 @@ export default function Content() {
         setError("No token found");
         return;
       }
-      console.log(userId2);
-      console.log(userId1);
+
       const responseMessage = await fetch(
         `${BASE_URL}/message/messages/${userId1}/${userId2}`,
         {
@@ -114,12 +114,24 @@ export default function Content() {
       if (!responseMessage.ok) {
         throw new Error(`HTTP error! status: ${responseMessage.status}`);
       }
-      // console.log(responseUsers);
 
       const resultMessage = await responseMessage.json();
-      console.log(resultMessage);
+      // console.log(resultMessage);
+
       if (resultMessage) {
-        setMessageData(resultMessage);
+        const updatedMessages = resultMessage.map((message) => {
+          if (message.imageBase64 && message.imageBase64.trim() !== "") {
+            const imageBlob = decompressBase64(message.imageBase64);
+            const imageUrl = URL.createObjectURL(imageBlob); // สร้าง URL จาก Blob
+            return {
+              ...message,
+              imageUrl, // เพิ่ม key ใหม่ที่ชื่อ imageUrl
+            };
+          }
+          return message; // ถ้าไม่มี imageBase64 ให้ return object เดิม
+        });
+
+        setMessageData(updatedMessages);
       } else {
         throw new Error("Data received is not an array");
       }
@@ -130,6 +142,22 @@ export default function Content() {
     }
   };
   //chat
+
+  //
+  const decompressBase64 = (base64String) => {
+    // แปลง base64 เป็น array buffer ก่อน
+    const binaryString = atob(base64String);
+    const binaryLength = binaryString.length;
+    const bytes = new Uint8Array(binaryLength);
+    for (let i = 0; i < binaryLength; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    // ใช้ pako.inflate เพื่อถอดการบีบอัด
+    const decompressedBytes = Pako.inflate(bytes);
+    return new Blob([decompressedBytes], { type: "image/jpeg" }); // เปลี่ยน type ตามประเภทของรูปภาพ
+  };
+
+  console.log(messageData);
 
   const handleOpenChat = (userId2, name2) => {
     fetchChatData(userId2);
@@ -196,14 +224,13 @@ export default function Content() {
                             </div>
                           )}
                           {row.message_type == 1 && (
-                            <div className="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
+                            <div className="relative mr-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
                               <div>
+                                {/* {console.log(row.imageBase64)} */}
                                 <img
-                                  src="/src/assets/1.jpeg"
+                                  src={`${row.imageUrl}`}
                                   className="w-56 cursor-pointer"
-                                  onClick={() =>
-                                    handleImageClick("/src/assets/1.jpeg")
-                                  } // เรียกใช้งานฟังก์ชันเมื่อคลิกที่รูปภาพ
+                                  onClick={() => handleImageClick(row.imageUrl)} // เรียกใช้งานฟังก์ชันเมื่อคลิกที่รูปภาพ
                                   alt="Thumbnail"
                                 />
                               </div>
@@ -228,14 +255,12 @@ export default function Content() {
                           {row.message_type == 1 && (
                             <div className="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
                               <div>
+                                {console.log(row.imageBase64)}
+                                {/* {decompressBase64Data(row.imageBase64)} */}
                                 <img
-                                  src="/src/assets/1.jpeg"
+                                  src={`${row.imageUrl}`}
                                   className="w-56 cursor-pointer"
-                                  onClick={() =>
-                                    handleImageClick(
-                                      "/src/assets/vector-users-icon.jpg"
-                                    )
-                                  } // เรียกใช้งานฟังก์ชันเมื่อคลิกที่รูปภาพ
+                                  onClick={() => handleImageClick(row.imageUrl)} // เรียกใช้งานฟังก์ชันเมื่อคลิกที่รูปภาพ
                                   alt="Thumbnail"
                                 />
                               </div>
@@ -245,36 +270,8 @@ export default function Content() {
                       </div>
                     )
                   )}
-                  <div
-                        
-                        className="col-start-1 col-end-8 p-3 rounded-lg"
-                      >
-                        <div className="flex flex-row items-center">
-                          <div className="flex text-white items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
-                            {username2.substring(0, 1).toLocaleUpperCase()}
-                          </div>
-
-                            {/* <div className="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
-                              <div>hello</div>
-                            </div> */}
-   
-                            <div className="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
-                              <div>
-                                <img
-                                  src="/src/assets/1.jpeg"
-                                  className="w-56 cursor-pointer"
-                                  onClick={() =>
-                                    handleImageClick(
-                                      "/src/assets/vector-users-icon.jpg"
-                                    )
-                                  } // เรียกใช้งานฟังก์ชันเมื่อคลิกที่รูปภาพ
-                                  alt="Thumbnail"
-                                />
-                              </div>
-                            </div>
-                       
-                        </div>
-                      </div>
+                  
+                  
                 </div>
               </div>
             </div>
@@ -289,7 +286,7 @@ export default function Content() {
                   />
                   <button
                     onClick={handleCloseModal}
-                    className="absolute top-2 right-2 text-white bg-red-600 rounded-full p-2"
+                    className="absolute top-2 right-2 texzt-white bg-red-600 rounded-full p-2"
                   >
                     X
                   </button>

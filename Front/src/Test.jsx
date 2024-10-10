@@ -64,77 +64,115 @@
 //     </div>
 //   );
 // }
+
+// import React, { useState } from 'react';
+
+// export default function ImageModal() {
+//   const [isOpen, setIsOpen] = useState(false); // state สำหรับเปิด/ปิด modal
+//   const [selectedImage, setSelectedImage] = useState(''); // state สำหรับเก็บ URL ของภาพที่เลือก
+
+//   const handleImageClick = (imageSrc) => {
+//     setSelectedImage(imageSrc); // ตั้งค่า URL ของภาพที่เลือก
+//     setIsOpen(true); // เปิด modal
+//   };
+
+//   const handleCloseModal = () => {
+//     setIsOpen(false); // ปิด modal
+//     setSelectedImage(''); // เคลียร์ URL ของภาพ
+//   };
+
+//   return (
+//     <div>
+//       <div className="col-start-1 col-end-8 p-3 rounded-lg">
+//         <div className="flex flex-row items-center">
+//           <div className="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
+//             A
+//           </div>
+//           <div className="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
+//             <div>
+//               <img
+//                 src="/src/assets/1.jpeg"
+//                 className="w-56 cursor-pointer"
+//                 onClick={() => handleImageClick('/src/assets/1.jpeg')} // เรียกใช้งานฟังก์ชันเมื่อคลิกที่รูปภาพ
+//                 alt="Thumbnail"
+//               />
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//       <div className="col-start-1 col-end-8 p-3 rounded-lg">
+//         <div className="flex flex-row items-center">
+//           <div className="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
+//             A
+//           </div>
+//           <div className="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
+//             <div>
+//               <img
+//                 src="/src/assets/vector-users-icon.jpg"
+//                 className="w-56 cursor-pointer"
+//                 onClick={() => handleImageClick('/src/assets/vector-users-icon.jpg')} // เรียกใช้งานฟังก์ชันเมื่อคลิกที่รูปภาพ
+//                 alt="Thumbnail"
+//               />
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Modal สำหรับแสดงรูปภาพขนาดเต็ม */}
+//       {isOpen && (
+//         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+//           <div className="relative">
+//             <img
+//               src={selectedImage}
+//               className="max-w-full max-h-screen" // จำกัดความสูงไม่ให้เกินหน้าจอ
+//               alt="Full Size"
+//             />
+//             <button
+//               onClick={handleCloseModal}
+//               className="absolute top-2 right-2 text-white bg-red-600 rounded-full p-2"
+//             >
+//               X
+//             </button>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+
 import React, { useState } from 'react';
 
-export default function ImageModal() {
-  const [isOpen, setIsOpen] = useState(false); // state สำหรับเปิด/ปิด modal
-  const [selectedImage, setSelectedImage] = useState(''); // state สำหรับเก็บ URL ของภาพที่เลือก
+const ByteArrayImage = () => {
+  const [byteArray, setByteArray] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
 
-  const handleImageClick = (imageSrc) => {
-    setSelectedImage(imageSrc); // ตั้งค่า URL ของภาพที่เลือก
-    setIsOpen(true); // เปิด modal
+  const handleInputChange = (event) => {
+    setByteArray(event.target.value);
   };
 
-  const handleCloseModal = () => {
-    setIsOpen(false); // ปิด modal
-    setSelectedImage(''); // เคลียร์ URL ของภาพ
+  const handleDisplayImage = () => {
+    // แปลง byte array เป็น Uint8Array
+    const bytes = byteArray.split(',').map(Number);
+    const blob = new Blob([new Uint8Array(bytes)], { type: 'image/jpeg' }); // เปลี่ยน type ตามประเภทของรูปภาพ
+    const url = URL.createObjectURL(blob);
+    setImageUrl(url);
   };
 
   return (
     <div>
-      <div className="col-start-1 col-end-8 p-3 rounded-lg">
-        <div className="flex flex-row items-center">
-          <div className="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
-            A
-          </div>
-          <div className="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
-            <div>
-              <img
-                src="/src/assets/1.jpeg"
-                className="w-56 cursor-pointer"
-                onClick={() => handleImageClick('/src/assets/1.jpeg')} // เรียกใช้งานฟังก์ชันเมื่อคลิกที่รูปภาพ
-                alt="Thumbnail"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="col-start-1 col-end-8 p-3 rounded-lg">
-        <div className="flex flex-row items-center">
-          <div className="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
-            A
-          </div>
-          <div className="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
-            <div>
-              <img
-                src="/src/assets/vector-users-icon.jpg"
-                className="w-56 cursor-pointer"
-                onClick={() => handleImageClick('/src/assets/vector-users-icon.jpg')} // เรียกใช้งานฟังก์ชันเมื่อคลิกที่รูปภาพ
-                alt="Thumbnail"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Modal สำหรับแสดงรูปภาพขนาดเต็ม */}
-      {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="relative">
-            <img
-              src={selectedImage}
-              className="max-w-full max-h-screen" // จำกัดความสูงไม่ให้เกินหน้าจอ
-              alt="Full Size"
-            />
-            <button
-              onClick={handleCloseModal}
-              className="absolute top-2 right-2 text-white bg-red-600 rounded-full p-2"
-            >
-              X
-            </button>
-          </div>
-        </div>
-      )}
+      <h1>แสดงรูปภาพจาก Byte Array</h1>
+      <textarea
+        rows="5"
+        cols="50"
+        placeholder="กรอก Byte Array (คั่นด้วย ,)"
+        value={byteArray}
+        onChange={handleInputChange}
+      />
+      <br />
+      <button onClick={handleDisplayImage}>แสดงรูปภาพ</button>
+      {imageUrl && <img src={imageUrl} alt="Converted" style={{ marginTop: '20px', maxWidth: '100%' }} />}
     </div>
   );
-}
+};
+
+export default ByteArrayImage;

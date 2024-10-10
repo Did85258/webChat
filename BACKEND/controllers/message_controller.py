@@ -5,7 +5,9 @@ from models.user_model import User
 from controllers.image_controller import ImageController
 from schemas.message_schema import MessageSchema ,MessageResponse, MessageSchemaIMG,MessageSchemaTEXT
 from datetime import datetime
-from .compress import compress_base64_data
+import gzip
+import base64
+from io import BytesIO
 
 
 class MessageController:
@@ -96,25 +98,26 @@ class MessageController:
             if message.image_id is not None:
                 try:
                     imgBase64 = ImageController.decrypt_image(db, message.image_id, message.receiver_id)
-                    print("Decrypted Image (Base64):", imgBase64)  # ตรวจสอบค่า
+                    #print("Decrypted Image (Base64):", imgBase64)  # ตรวจสอบค่า
+                    
                     if imgBase64:
-                        imgBase64 = compress_base64_data(imgBase64)
+                        imgBase64 = MessageController.compress_base64_data(imgBase64)
                         print("Compressed Base64:", imgBase64)  # ตรวจสอบค่า
-
+                    
                 except HTTPException:
                     imgBase64 = None
                     print("Error in decrypting image.")
-                    print({
-                            "message_id": message.message_id,
-                            "sender_id": message.sender_id,
-                            "receiver_id": message.receiver_id,
-                            "content": message.content,
-                            "imageBase64": imgBase64 if imgBase64 else "No Image",
-                            "timestamp": message.timestamp.isoformat(),
-                            "message_type": message.message_type,
-                            "sender_username": sender_username,
-                            "receiver_username": receiver_username
-                        })
+                    # print({
+                    #     "message_id": message.message_id,
+                    #     "sender_id": message.sender_id,
+                    #     "receiver_id": message.receiver_id,
+                    #     "content": message.content,
+                    #     "imageBase64": imgBase64 if imgBase64 else "No Image",
+                    #     "timestamp": message.timestamp.isoformat(),
+                    #     "message_type": message.message_type,
+                    #     "sender_username": sender_username,
+                    #     "receiver_username": receiver_username
+                    # })
 
 
 
@@ -130,7 +133,22 @@ class MessageController:
                 "receiver_username": receiver_username
             })
                 
-
+        
         return response
-
+    
+    def compress_base64_data(img_base64: str) -> str:
+        
+        
+        # แปลง base64 string ให้เป็น bytes
+        img_data = base64.b64decode(img_base64)
+        
+        # บีบอัดด้วย gzip
+        buffer = BytesIO()
+        with gzip.GzipFile(fileobj=buffer, mode='wb') as f:
+            f.write(img_data)
+        
+        # แปลงกลับเป็น base64 ที่บีบอัดแล้ว
+        compressed_img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+        
+        return compressed_img_base64
 
