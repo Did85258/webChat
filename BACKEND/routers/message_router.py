@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from database import get_db
 from controllers.message_controller import MessageController
-from schemas.message_schema import MessageSchema,MessageResponse
+from schemas.message_schema import MessageSchema,MessageResponse,MessageSchemaIMG,MessageSchemaTEXT
 from typing import List
 from middleware import check_permissions, decode_token
 
@@ -18,10 +18,18 @@ async def read_all_messages(db: Session = Depends(get_db), role: str = Depends(c
 async def read_message(message_id: int, db: Session = Depends(get_db), role: str = Depends(check_permissions)):
     return MessageController.get_message(db, message_id)
 
-# สร้างข้อความใหม่
-@router.post("/", response_model=MessageSchema)
-async def create_message(message: MessageSchema, db: Session = Depends(get_db), role: str = Depends(check_permissions)):
-    return MessageController.create_message(db, message)
+# # สร้างข้อความใหม่
+# @router.post("/", response_model=MessageSchema)
+# async def create_message(message: MessageSchema, db: Session = Depends(get_db), role: str = Depends(check_permissions)):
+#     return MessageController.create_message(db, message)
+
+@router.post("/text", response_model=MessageSchemaTEXT)
+async def create_messageTEXT(message: MessageSchemaTEXT, db: Session = Depends(get_db), role: str = Depends(check_permissions)):
+    return MessageController.create_messageTEXT(db, message)
+
+@router.post("/img", response_model=MessageSchemaIMG)
+async def create_messageIMG(message: MessageSchemaIMG, db: Session = Depends(get_db), role: str = Depends(check_permissions)):
+    return MessageController.create_messageIMG(db, message)
 
 # อัปเดตข้อความที่มีอยู่
 @router.put("/{message_id}", response_model=MessageSchema)

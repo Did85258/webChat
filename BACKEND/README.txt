@@ -9,3 +9,4 @@ python-jose
 passlib
 requests 
 cryptography
+pycryptodome

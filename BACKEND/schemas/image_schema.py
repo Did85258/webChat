@@ -9,10 +9,13 @@ class ImageBase(BaseModel):
     encryption_key: str
 
 class ImageCreate(ImageBase):
-    user_id: int
+    image_path: str
+    encryption_key: str
 
-class ImageResponse(ImageBase):
+class ImageResponse(BaseModel):
     image_id: int
+    image_path: str
+    encryption_key: str
 
     class Config:
         from_attributes = True
