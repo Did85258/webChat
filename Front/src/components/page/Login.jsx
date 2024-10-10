@@ -1,4 +1,94 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+
+const BASE_URL = "http://127.0.0.1:8000";
+
 export default function Login() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("employeeToken");
+    const token2 = localStorage.getItem("userToken");
+    if (token) {
+      navigate("/employee/home");
+    }
+    if (token2) {
+      navigate("/home");
+    }
+  }, [navigate]);
+
+  const Login = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`${BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username: username, password: password }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+
+      if (data.access_token) {
+        localStorage.setItem("userToken", data.access_token);
+        localStorage.setItem("userId", data.user_id);
+        localStorage.setItem("userName", data.username);
+        setError("");
+        navigate("/home");
+        Swal.fire({
+          title: "Success!",
+          text: "Login successful.",
+          icon: "success",
+          confirmButtonText: "OK",
+          confirmButtonColor: "#28a745",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.reload();
+          }
+        });
+      } else {
+        setError("No token received");
+        Swal.fire({
+          title: "Error!",
+          text: "No token received.",
+          icon: "error",
+          confirmButtonText: "OK",
+          confirmButtonColor: "#d33",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setError("Failed to login");
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to login.",
+        icon: "error",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#d33",
+      });
+    }
+  };
+
+  const handleUsernameChange = (event) => {
+    setUsername(event.target.value);
+  };
+
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value);
+  };
+
+  const handleRegisterClick = () => {
+    navigate("/register"); // ไปที่ path /register
+  };
   return (
     <>
       <section className="bg-slate-700 w-screen h-screen">
@@ -7,7 +97,7 @@ export default function Login() {
             <h1 className="text-2xl font-bold text-center mb-4 dark:text-gray-200">
               Login
             </h1>
-            <form action="#">
+            <form action="#" onSubmit={Login}>
               <div className="mb-4">
                 <label
                   htmlFor="email"
@@ -21,6 +111,7 @@ export default function Login() {
                   className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                   placeholder="your@email.com"
                   required
+                  onChange={handleUsernameChange}
                 />
               </div>
               <div className="mb-4">
@@ -36,11 +127,12 @@ export default function Login() {
                   className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                   placeholder="Enter your password"
                   required
+                  onChange={handlePasswordChange}
                 />
               </div>
               <div className="flex items-center justify-between mb-4">
                 <a
-                  href="#"
+                  href="./register"
                   className="text-xs text-indigo-500 hover:text-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   Create Account

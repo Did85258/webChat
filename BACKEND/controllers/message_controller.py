@@ -5,6 +5,9 @@ from models.user_model import User
 from controllers.image_controller import ImageController
 from schemas.message_schema import MessageSchema ,MessageResponse, MessageSchemaIMG,MessageSchemaTEXT
 from datetime import datetime
+from .compress import compress_base64_data
+
+
 class MessageController:
 
     def get_message(db: Session, message_id: int):
@@ -75,7 +78,6 @@ class MessageController:
         return {"detail": "Message deleted successfully"}
     
     def get_messages(user_id_1: int, user_id_2: int, db: Session):
-        # ค้นหาข้อความที่ส่งระหว่าง user_id_1 และ user_id_2
         messages = db.query(Message).filter(
             (Message.sender_id == user_id_1) & (Message.receiver_id == user_id_2) |
             (Message.sender_id == user_id_2) & (Message.receiver_id == user_id_1)
@@ -84,36 +86,51 @@ class MessageController:
         if not messages:
             raise HTTPException(status_code=404, detail="No messages found")
 
-        # ตรวจสอบว่า message มี image_id หรือไม่
-        
-
         response = []
-        
+
         for message in messages:
             sender_username = db.query(User).filter(User.user_id == message.sender_id).first().user_name
             receiver_username = db.query(User).filter(User.user_id == message.receiver_id).first().user_name
 
             imgBase64 = None
-            # ตรวจสอบว่า message.image_id ไม่เป็น None
             if message.image_id is not None:
                 try:
                     imgBase64 = ImageController.decrypt_image(db, message.image_id, message.receiver_id)
-                    #print(imgBase64)
+                    print("Decrypted Image (Base64):", imgBase64)  # ตรวจสอบค่า
+                    if imgBase64:
+                        imgBase64 = compress_base64_data(imgBase64)
+                        print("Compressed Base64:", imgBase64)  # ตรวจสอบค่า
+
                 except HTTPException:
-                    imgBase64 = None  # กรณีที่เกิดข้อผิดพลาดในการถอดรหัสภาพ
-                    #print('mai joo')
+                    imgBase64 = None
+                    print("Error in decrypting image.")
+                    print({
+                            "message_id": message.message_id,
+                            "sender_id": message.sender_id,
+                            "receiver_id": message.receiver_id,
+                            "content": message.content,
+                            "imageBase64": imgBase64 if imgBase64 else "No Image",
+                            "timestamp": message.timestamp.isoformat(),
+                            "message_type": message.message_type,
+                            "sender_username": sender_username,
+                            "receiver_username": receiver_username
+                        })
+
+
+
             response.append({
                 "message_id": message.message_id,
                 "sender_id": message.sender_id,
                 "receiver_id": message.receiver_id,
                 "content": message.content,
-                "imgBase64": imgBase64,
-                "timestamp": message.timestamp.isoformat(),  # แปลงเป็น string
+                "imageBase64": imgBase64 if imgBase64 else "",  # ตรวจสอบค่าที่ได้
+                "timestamp": message.timestamp.isoformat(),
                 "message_type": message.message_type,
                 "sender_username": sender_username,
                 "receiver_username": receiver_username
             })
+                
 
         return response
-    
+
 

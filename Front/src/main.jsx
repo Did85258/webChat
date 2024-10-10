@@ -9,11 +9,16 @@ import App from "./App";
 import Test from "./Test";
 import Login from "./components/page/Login";
 import Register from "./components/page/Register";
+import { ProtectedRouteUser } from "./components/Protect/ProtectedRoute";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <Login />,
+  },
+  {
+    path: "/home",
+    element: <ProtectedRouteUser element={<App />} />,
   },
   {
     path: "/test",

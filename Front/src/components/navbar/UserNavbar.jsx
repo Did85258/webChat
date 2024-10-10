@@ -1,4 +1,30 @@
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+
 export default function UserNavbar() {
+  const navigate = useNavigate();
+  const userName1 = localStorage.getItem("userName");
+  const handleLogout = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, log out",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem("userToken");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("userName");
+        navigate("/login");
+        window.location.reload();
+      }
+    });
+  };
+
   return (
     <div>
       <nav className="w-screen border-gray-200 bg-gray-900">
@@ -32,16 +58,13 @@ export default function UserNavbar() {
               id="user-dropdown"
             >
               <div className="px-4 py-3">
-                <span className="block text-sm  text-white">Bonnie Green</span>
-                <span className="block text-sm  truncate text-gray-400">
-                  name@flowbite.com
-                </span>
+                <span className="block text-sm  text-white">Username : {userName1}</span>
               </div>
               <ul className="py-2" aria-labelledby="user-menu-button">
                 <div
                   className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 hover:text-white "
                   role="menuitem"
-                  //   onClick={handleLogout}
+                    onClick={handleLogout}
                 >
                   <svg
                     className="flex-shrink-0 w-5 h-5 mr-3 transition duration-75 text-gray-400  group-hover:text-white"

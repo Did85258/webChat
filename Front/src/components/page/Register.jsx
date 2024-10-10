@@ -1,4 +1,73 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+
+const BASE_URL = "http://127.0.0.1:8000";
+
 export default function Register() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const CreateEmployee = async (e) => {
+    console.log("call CreateEmployee");
+    e.preventDefault();
+    try {
+
+      const responseCreate = await fetch(`${BASE_URL}/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_name: username,
+          password: password,
+        }),
+      });
+      // console.log(responseCreate);
+      // const data = await responseCreate.json()
+      // console.log(data);
+      if (responseCreate.ok) {
+        Swal.fire({
+          title: "Create Success!",
+          text: "Create Employee Success!",
+          icon: "success",
+          confirmButtonText: "OK",
+          confirmButtonColor: "#28a745",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate("/");
+          }
+        });
+      } else {
+        const data = await responseCreate.json()
+        Swal.fire({
+          title: "Error!",
+          text: data.detail,
+          icon: "error",
+          confirmButtonText: "OK",
+          confirmButtonColor: "#d33"
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to Create.",
+        icon: "error",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#d33"
+      });
+    }
+  };
+
+  const handleUsernameChange = (event) => {
+    setUsername(event.target.value);
+  };
+
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value);
+  };
   return (
     <>
       <section className="bg-slate-700 w-screen h-screen">
@@ -7,7 +76,7 @@ export default function Register() {
             <h1 className="text-2xl font-bold text-center mb-4 dark:text-gray-200">
               Sign up your account
             </h1>
-            <form action="#">
+            <form action="#" onSubmit={CreateEmployee}>
               <div className="mb-4">
                 <label
                   htmlFor="email"
@@ -21,6 +90,7 @@ export default function Register() {
                   className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                   placeholder="your@email.com"
                   required
+                  onChange={handleUsernameChange}
                 />
               </div>
               <div className="mb-4">
@@ -36,6 +106,7 @@ export default function Register() {
                   className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                   placeholder="Enter your password"
                   required
+                  onChange={handlePasswordChange}
                 />
               </div>
 
