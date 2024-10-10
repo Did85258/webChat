@@ -131,22 +131,6 @@ export default function Content() {
   };
   //chat
 
-  // ฟังก์ชันสำหรับถอดรหัส Base64 ที่บีบอัด
-  const decompressBase64Data = (base64) => {
-    const binaryString = window.atob(base64);
-    const len = binaryString.length;
-    const bytes = new Uint8Array(len);
-
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-
-    // สร้าง Blob จาก byte array
-    const blob = new Blob([bytes], { type: "image/png" }); // แก้ไขตามประเภทของภาพที่ใช้
-    return URL.createObjectURL(blob);
-  };
-  //ฟังก์ชันสำหรับถอดรหัส Base64 ที่บีบอัด
-
   const handleOpenChat = (userId2, name2) => {
     fetchChatData(userId2);
     setNameChatWith(name2);
@@ -214,10 +198,8 @@ export default function Content() {
                           {row.message_type == 1 && (
                             <div className="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
                               <div>
-                                {/* {console.log(row.imageBase64)} */}
-                                {decompressBase64Data(row.imageBase64)}
                                 <img
-                                  src={`data:image/jpeg;base64,${row.imageBase64}`}
+                                  src="/src/assets/1.jpeg"
                                   className="w-56 cursor-pointer"
                                   onClick={() =>
                                     handleImageClick("/src/assets/1.jpeg")
@@ -246,12 +228,8 @@ export default function Content() {
                           {row.message_type == 1 && (
                             <div className="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
                               <div>
-                                {/* {console.log(row.imageBase64)} */}
-                                {decompressBase64Data(row.imageBase64)}
                                 <img
-                                  src={`data:image/png;base64,${decompressBase64Data(
-                                    row.imageBase64
-                                  )}`}
+                                  src="/src/assets/1.jpeg"
                                   className="w-56 cursor-pointer"
                                   onClick={() =>
                                     handleImageClick(
@@ -267,32 +245,36 @@ export default function Content() {
                       </div>
                     )
                   )}
-                  <div className="col-start-1 col-end-8 p-3 rounded-lg">
-                    <div className="flex flex-row items-center">
-                      <div className="flex text-white items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
-                        {username2.substring(0, 1).toLocaleUpperCase()}
-                      </div>
+                  <div
+                        
+                        className="col-start-1 col-end-8 p-3 rounded-lg"
+                      >
+                        <div className="flex flex-row items-center">
+                          <div className="flex text-white items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
+                            {username2.substring(0, 1).toLocaleUpperCase()}
+                          </div>
 
-                      {/* <div className="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
+                            {/* <div className="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
                               <div>hello</div>
                             </div> */}
-
-                      <div className="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
-                        <div>
-                          <img
-                            src="/src/assets/1.jpeg"
-                            className="w-56 cursor-pointer"
-                            onClick={() =>
-                              handleImageClick(
-                                "/src/assets/vector-users-icon.jpg"
-                              )
-                            } // เรียกใช้งานฟังก์ชันเมื่อคลิกที่รูปภาพ
-                            alt="Thumbnail"
-                          />
+   
+                            <div className="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
+                              <div>
+                                <img
+                                  src="/src/assets/1.jpeg"
+                                  className="w-56 cursor-pointer"
+                                  onClick={() =>
+                                    handleImageClick(
+                                      "/src/assets/vector-users-icon.jpg"
+                                    )
+                                  } // เรียกใช้งานฟังก์ชันเมื่อคลิกที่รูปภาพ
+                                  alt="Thumbnail"
+                                />
+                              </div>
+                            </div>
+                       
                         </div>
                       </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -307,7 +289,7 @@ export default function Content() {
                   />
                   <button
                     onClick={handleCloseModal}
-                    className="absolute top-2 right-2 text-white bg-red-600 rounded-full p-2"
+                    className="absolute top-2 right-2 texzt-white bg-red-600 rounded-full p-2"
                   >
                     X
                   </button>
