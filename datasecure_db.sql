@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 09, 2024 at 06:34 PM
+-- Generation Time: Oct 10, 2024 at 03:51 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -38,7 +38,7 @@ CREATE TABLE `images` (
 --
 
 INSERT INTO `images` (`image_id`, `encryption_key`, `storage_url`) VALUES
-(2, 'string', 'string');
+(14, 'FSU1v/eDdAFRHfyQe801ZWQ2Voo5DprSO0BEFwGzVoWVpPok3tciKbbs3TWNcu/lTobCZ9VRKvTcZr5Vv9wYN/UXMRsoqliPJ7w1u6RZeSkDwsGoJgBsmhgX5Cm027gHZjiFrxnJCots/fefVGl+ficp+mppaYBqwpw2zgGxyENMgbAo80wlDeN6wUn3J7JvMqP2SKJNfMqpc8KUargPu9ZFka+OTUFNrgFcLX8psXkcLGnFtcMhaMtS2CD7IuYVZOaN1YNQ0PuWQ/hOXIDqXgatl46zVtZjufx7HwdPbtoU+/+5Di61e/IqcKu0MZeFyV9ifGr2I12ppSx2BVkGkQ==', 'uploads/14_148015.jpg.bin');
 
 -- --------------------------------------------------------
 
@@ -61,10 +61,11 @@ CREATE TABLE `messages` (
 --
 
 INSERT INTO `messages` (`message_id`, `sender_id`, `receiver_id`, `timestamp`, `content`, `image_id`, `message_type`) VALUES
-(4, 7, 8, '2024-10-09 04:58:12', 'string', 2, 1),
 (9, 7, 8, '2024-10-09 15:50:53', 'dzfbfdbdfzdb', NULL, 0),
 (10, 8, 7, '2024-10-09 15:51:16', 'ahgaggtgtg', NULL, 0),
-(11, 7, 9, '2024-10-09 16:16:52', 'etahbthbstrngfvcvvcvb', NULL, 0);
+(11, 7, 9, '2024-10-09 16:16:52', 'etahbthbstrngfvcvvcvb', NULL, 0),
+(13, 7, 8, '2024-10-09 10:24:11', 'stringHello', NULL, 0),
+(14, 7, 9, '2024-10-09 10:24:16', 'stringHello', 14, 1);
 
 -- --------------------------------------------------------
 
@@ -84,9 +85,6 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`user_id`, `user_name`, `password`, `public_key`) VALUES
-(3, 'admin', 'ac9689e2272427085e35b9d3e3e8bed88cb3434828b43b86fc0596cad4c6e270', ''),
-(5, 'user', '831c237928e6212bedaa4451a514ace3174562f6761f6a157a2fe5082b36e2fb', ''),
-(6, 'test', '937e8d5fbb48bd4949536cd65b8d35c426b80d2f830c5c308e2cdec422ae2244', ''),
 (7, 'paper', '4ef47dd8aaa341823ef1200072607f1e0a606d6ffcb1015ec076e6dd15d3776c', '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA05pFYLYvTZ3TC9wGTnOT\nQ2KTCFaJEKMaXtO6yjuIIRv9okotQk8C7IyYw8ElPzhtNS3h3MzfhMEuAruSF3Hf\nY367WUlmPpijZ3OkX1ZOrhDCkCa1q37Le74pyxnoQia8a48NEIOGdGuxzAQTBlIf\nISpqCYF4FVzcEsEFZKkcYqlEP47JDI+xGiOfiIcHnUZQdsQmMjJ9Ba9ECTxTixf/\nRL5kt0HyZrDT/EXhNOQUFJquZZ+8Dik7oypqYavgNeb75TjcMLsDeaRBWuMCicqh\nMp0IyxFnC+IMAHl4JTsBNDZkhhzC+Vd5YwnY6Mv9ay88ecLTculme7QqAtbaTc5m\nbQIDAQAB\n-----END PUBLIC KEY-----\n'),
 (8, 'did', '6b898dbae075a35790c6f6244164d065e1fbcad3ec48f7bdda70014c2e8acbd4', '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiPreAM4HyMJ4EmdIEPAm\nLhHn67K2UebO18mDeNo6D/C8LbdV0qMOGyZ90RgXknbcDuoMpH1xEo1/kqfFOiGp\nSNzaPAtUoKjEJGNMu5DbxdfMujldaY8Jhf88886UeOWs/3DsEHOU1xKj6rinNUvI\nLc/giKYup6qLKmrelFFcZ6iTG4Tw9vMSZWL0RycfPcZYojbee3V+KqiWetu2n/sd\nVlVG1/SnK2C1NuSPRSxx3Xu+oO66xpT9SvJ0rj4a4vNHPVQ2BSg0fYKIYB+sBQqj\nMrng0vVNp8N5mYcahv5d8D3g3kcY4ASiMN0VmmorUsm8mz3y83kdLin8Vcx0ZqdW\nmQIDAQAB\n-----END PUBLIC KEY-----\n'),
 (9, 'best', '20b3df11e7a4a4a6b4e51b874392413ac37411896c6b1957eac94546cf946b5a', '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAw2cNRGyA9XvxNUGDiXW5\nXOdhMRVtL3yhfz++L4Gy91hP7Ymd4rbmW6t9ia8+bPsIuMpCiNpqD1sFg6c+eXhG\nES9XEJmVTcvjug0mE12YM2cfdBnrasCybdNy7bYavpVP9iuiGOk9kcll44K/NNjc\nf1ftA8ToKiPs6qztHHgSX1bXEK+7Z0oZ4nL+gfZx3AOG6J/HQI0sroCmfwVuaiwC\ngnK68ATqhsMe+0cz3F2UmW2KGI/nxK6ZVbxY2xEAb7etYXjgCH/dJeluLM0ITNfp\nucUXf01sEgPtGQ+7k/fS6tPp3G4wkotSHKKh5Wk22TcZOgHVQuJUJ2BwTbfjZ9Kc\nXQIDAQAB\n-----END PUBLIC KEY-----\n');
@@ -124,13 +122,13 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `images`
 --
 ALTER TABLE `images`
-  MODIFY `image_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `image_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `message_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `message_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `user`
