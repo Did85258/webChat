@@ -182,9 +182,9 @@ class ImageController:
             decrypted_image = cipher.decrypt_and_verify(ciphertext, tag)
         except ValueError:
             raise HTTPException(status_code=400, detail="การตรวจสอบความถูกต้องล้มเหลว! ข้อมูลอาจถูกดัดแปลง.")
-        with open('decrypted_image.jpg', 'wb') as f:
-            f.write(decrypted_image)
-            print(decrypted_image)
+        # with open('decrypted_image.jpg', 'wb') as f:
+            # f.write(decrypted_image)
+            # print(decrypted_image)
             print("การเข้ารหัสและถอดรหัสเสร็จสมบูรณ์!")
 
         print(decrypted_image)

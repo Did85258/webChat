@@ -1,34 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import Chat from "./Chat";
 import Pako from "pako";
+import Swal from "sweetalert2";
 const BASE_URL = "http://127.0.0.1:8000";
 export default function Content() {
-  const fileInputRef = useRef(null); // สร้าง reference สำหรับ input file
   const [username2, setNameChatWith] = useState("");
+  const [userId2, setUserId2] = useState("");
   const userId1 = localStorage.getItem("userId");
   const userName1 = localStorage.getItem("userName");
-  const handleButtonClick = () => {
-    // เมื่อคลิกปุ่มให้เปิด dialog ของ input file
-    fileInputRef.current.click();
-  };
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0]; // เข้าถึงไฟล์ที่ผู้ใช้เลือก
-    if (file) {
-      // ทำการประมวลผลไฟล์ที่เลือกได้ที่นี่
-      console.log("Selected file:", file);
-      // คุณสามารถแสดงตัวอย่างภาพได้หากต้องการ
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        console.log("Image preview:", e.target.result);
-        // สามารถแสดงภาพที่นี่ได้
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   //chose people
   const [usersData, setUsersData] = useState([]);
+
+  
   useEffect(() => {
     const fetcUsersData = async () => {
       try {
@@ -143,6 +127,94 @@ export default function Content() {
   };
   //chat
 
+  //text
+  const [message, setMessage] = useState();
+  const CreateMassage = async () => {
+    try {
+      const token = localStorage.getItem("userToken");
+      if (!token) {
+        console.error("No token found");
+        return;
+      }
+      //   console.log(token);
+      const responseCreate = await fetch(`${BASE_URL}/message/text`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          sender_id: userId1,
+          receiver_id: userId2,
+          content: message,
+        }),
+      });
+
+      if (responseCreate.ok) {
+        fetchChatData(userId2);
+        setMessage("");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to Create.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    }
+  };
+  //text
+
+  //image
+  const fileInputRef = useRef(null);
+
+  const handleButtonClick = () => {
+    // คลิกที่ input file โดยอัตโนมัติ
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) {
+      alert("Please select a file.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const token = localStorage.getItem("userToken");
+      if (!token) {
+        console.error("No token found");
+        return;
+      }
+      const response = await fetch(
+        `http://127.0.0.1:8000/image/upload/${userId1}/${userId2}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            accept: "application/json",
+          },
+          body: formData,
+        }
+      );
+      console.log("Upload successful:");
+      if (response.ok) {
+        // const result = await response.json();
+        fetchChatData(userId2)
+        console.log("Upload successful:", result);
+      } else {
+        console.error("Upload failed:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
+  };
+  //image
+
   //
   const decompressBase64 = (base64String) => {
     // แปลง base64 เป็น array buffer ก่อน
@@ -161,6 +233,7 @@ export default function Content() {
 
   const handleOpenChat = (userId2, name2) => {
     fetchChatData(userId2);
+    setUserId2(userId2);
     setNameChatWith(name2);
   };
 
@@ -224,7 +297,7 @@ export default function Content() {
                             </div>
                           )}
                           {row.message_type == 1 && (
-                            <div className="relative mr-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
+                            <div className="relative mr-3 text-sm bg-indigo-100 py-2 px-4 shadow rounded-xl">
                               <div>
                                 {/* {console.log(row.imageBase64)} */}
                                 <img
@@ -255,7 +328,6 @@ export default function Content() {
                           {row.message_type == 1 && (
                             <div className="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
                               <div>
-                                {console.log(row.imageBase64)}
                                 {/* {decompressBase64Data(row.imageBase64)} */}
                                 <img
                                   src={`${row.imageUrl}`}
@@ -270,8 +342,6 @@ export default function Content() {
                       </div>
                     )
                   )}
-                  
-                  
                 </div>
               </div>
             </div>
@@ -296,6 +366,14 @@ export default function Content() {
 
             <div className="flex flex-row items-center h-16 rounded-xl bg-white w-full px-4">
               <div>
+                {/* Input file ซ่อน */}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  style={{ display: "none" }} // ซ่อน input
+                  onChange={handleFileChange}
+                />
+                {/* ปุ่มอัปโหลด */}
                 <button
                   className="flex items-center justify-center text-gray-400 hover:text-gray-600"
                   onClick={handleButtonClick}
@@ -315,26 +393,22 @@ export default function Content() {
                     ></path>
                   </svg>
                 </button>
-
-                {/* ซ่อน input file */}
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  className="hidden"
-                  accept="image/*" // จำกัดเฉพาะไฟล์ภาพ
-                />
               </div>
               <div className="flex-grow ml-4">
                 <div className=" w-full">
                   <input
                     type="text"
-                    className="flex w-full border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10"
+                    className="flex w-full border rounded-xl focus:o.imageUrl"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
                   />
                 </div>
               </div>
               <div className="ml-4">
-                <button className="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0">
+                <button
+                  className="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0"
+                  onClick={CreateMassage}
+                >
                   <span>Send</span>
                   <span className="ml-2">
                     <svg
